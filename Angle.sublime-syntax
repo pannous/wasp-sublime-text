@@ -130,7 +130,7 @@ contexts:
       captures:
         1: keyword.operator.angle
 
-    - match: \b(block|do|until|br|br_if|br_table|call|call_indirect|current_memory|drop|elem|export|func|get_global|get_local|global|grow_memory|if|import|local|loop|memory|module|nop|param|result|return|select|set_global|set_local|start|table|tee_local|type|unreachable)\b
+    - match: \b(block|do|until|br|br_if|br_table|call|call_indirect|current_memory|drop|elem|export|func|get_global|get_local|global|grow_memory|if|else|import|local|loop|memory|module|nop|param|result|return|select|set_global|set_local|start|table|tee_local|type|unreachable)\b
       captures:
         1: keyword.angle
       scope: keyword.angle
