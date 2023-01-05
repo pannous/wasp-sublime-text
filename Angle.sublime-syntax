@@ -1,0 +1,142 @@
+%YAML 1.2
+---
+name: Angle
+file_extensions:
+  - a
+  - an
+  - ang
+  - angl
+  - angle
+  - wasp
+scope: source.wasp
+
+variables:
+  name: "(?:\\w)+"
+
+contexts:
+  main:
+    - include: comments
+    - include: parens
+    - include: expressions
+
+  comments:
+    - match: '//'
+      scope: punctuation.definition.comment.angle
+      push:
+        - meta_scope: comment.line.semicolon.angle
+        - match: '\n'
+          pop: true
+
+    - match: '#'
+      scope: punctuation.definition.comment.angle
+      push:
+        - meta_scope: comment.line.semicolon.angle
+        - match: '\n'
+          pop: true
+
+    # - match: '//'
+    #       scope: punctuation.definition.comment.js
+    #       push:
+    #         - meta_scope: comment.line.double-slash.js
+    #         - match: '\n'
+    #           pop: true
+
+    # - match: (;).*$\n?
+    #   scope: comment.line.semicolon.angle
+    #   captures:
+    #     1: punctuation.definition.comment.angle
+
+  parens:
+    - match: '\('
+      scope: punctuation.definition.group.begin.angle
+      push:
+        - meta_scope: meta.group.angle
+        - match: '\)'
+          scope: punctuation.definition.group.end.angle
+          pop: true
+        - include: expressions
+        - include: parens
+    - match: '\)'
+      scope: invalid.illegal.stray-bracket-end.angle
+
+  ##############################################################################
+
+  expressions:
+    - include: comments
+    - include: numbers
+    - include: strings
+    - include: names
+    - include: keywords
+
+  ##############################################################################
+
+  numbers:
+    - match: \b((0(x|X)\h*)|([0-9]+\.?[0-9]*)|(\.[0-9]+))\b
+      scope: constant.numeric.angle
+
+    - match: \b(no|true|false|all|none)\b
+      scope: constant.numeric.angle
+      
+
+  strings:
+    - match: '"'
+      scope: punctuation.definition.string.begin.angle
+      push:
+        - meta_scope: string.quoted.double.angle
+        - match: '(")|(\n)'
+          captures:
+            1: punctuation.definition.string.end.angle
+            2: invalid.illegal.newline.angle
+          pop: true
+        - match: \\\h\h
+          scope: constant.character.escape.angle
+        - match: \\.
+          scope: constant.character.escape.angle
+
+  names:
+    - match: (do|while|block|br|br_if|loop)\s+({{name}})
+      captures:
+        1: keyword.control.angle
+        2: entity.name.label.angle
+
+    - match: ^\s*(to|def|call|func|function|start)\s+({{name}})
+      captures:
+        1: keyword.control.angle
+        2: entity.name.function.angle
+
+    # - match: '{{name}}'
+    #   scope: entity.name.angle
+
+  keywords:
+    - match: \b(get|load|store|set|let|save)\s+({{name}})\b
+      captures:
+        1: keyword.operator.assignment.angle
+        2: storage.type.angle
+
+    - match: ({{name}})\s*(=)
+      captures:
+        1: entity.name.angle
+        2: keyword.operator.assignment.angle
+
+    - match: \b(add|sub)\b
+      captures:
+        1: keyword.operator.arithmetic.angle
+
+    - match: \b(add|sub|mul[tiply]|div[ide]|eq[uals]|eqz|ne|abs[olute]|neg[ative]|copy|ceil|floor|trunc|sqrt|min[imum]|max[imum])\b
+      captures:
+        1: keyword.operator.arithmetic.angle
+
+    - match: \b(of|in|at|to)\b
+      captures:
+        1: keyword.operator.angle
+
+    - match: \b(block|do|until|br|br_if|br_table|call|call_indirect|current_memory|drop|elem|export|func|get_global|get_local|global|grow_memory|if|import|local|loop|memory|module|nop|param|result|return|select|set_global|set_local|start|table|tee_local|type|unreachable)\b
+      captures:
+        1: keyword.angle
+      scope: keyword.angle
+
+    - match: \b(char|data|pointer|string|int|integer|float|f64|i32|i64)\b
+      scope: storage.type.angle
+
+    - match: \b(const[ant]|mut|static)\b
+      scope: storage.modifier.angle
