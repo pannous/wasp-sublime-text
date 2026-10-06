@@ -1,0 +1,200 @@
+# SYNTAX TEST "Packages/Angle/Wasp.sublime-syntax"
+
+// a line comment
+# <- comment.line.wasp punctuation.definition.comment.wasp
+#^^^^^^^^^^^^^^^^ comment.line.wasp
+
+# a hash comment at a line start
+# <- comment.line.wasp
+
+/* block /* nested */ still comment */ x
+# <- comment.block.wasp
+#                     ^^^^^^^^^^^^^^^^ comment.block.wasp
+#                                      ^ - comment
+
+/# hash block #/ y
+# <- comment.block.wasp
+#                ^ - comment
+
+x = 7//2 // floor division, then a comment
+#    ^^ keyword.operator.arithmetic.wasp
+#        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.wasp
+
+url = "http://wasp.pannous.com"
+#     ^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double.wasp - comment
+
+greeting = "hello $name and ${1+2} or \(it) \n"
+#          ^ string.quoted.double.wasp punctuation.definition.string.begin.wasp
+#                 ^^^^^ variable.other.interpolated.wasp
+#                           ^^^^^^ meta.interpolation.wasp - string
+#                             ^ constant.numeric.wasp
+#                                     ^^^^^ meta.interpolation.wasp
+#                                       ^^ variable.language.wasp
+#                                           ^^ constant.character.escape.wasp
+
+single = 'no $holes here\t'
+#        ^^^^^^^^^^^^^^^^^^ string.quoted.single.wasp
+#            ^^^^^^ - variable
+#                       ^^ constant.character.escape.wasp
+
+letter = 'a' + "b" + '\n'
+#        ^^^ string.quoted.single.wasp constant.character.codepoint.wasp
+#              ^^^ string.quoted.double.wasp constant.character.codepoint.wasp
+#                    ^^^^ constant.character.codepoint.wasp
+
+name = alice's name
+#           ^^ keyword.operator.possessive.wasp
+#              ^^^^ - string
+
+quoted = «guillemets»
+#        ^^^^^^^^^^^^ string.quoted.other.wasp
+
+n = 42 + 3.14 + 1e9 + 0xFF + 1_000
+#   ^^ constant.numeric.wasp
+#        ^^^^ constant.numeric.wasp
+#               ^^^ constant.numeric.wasp
+#                     ^^^^ constant.numeric.wasp
+#                            ^^^^^ constant.numeric.wasp
+
+sleep 1000 ms
+# <- support.function.builtin.wasp
+#     ^^^^ constant.numeric.wasp
+#          ^^ keyword.other.unit.wasp
+
+d = 3km + 2 minutes + 1st
+#   ^ constant.numeric.wasp
+#    ^^ keyword.other.unit.wasp
+#           ^^^^^^^ keyword.other.unit.wasp
+#                     ^ constant.numeric.wasp
+#                      ^^ constant.numeric.suffix.ordinal.wasp
+
+m = 3
+# <- - keyword.other.unit
+
+flags = [true, false, ø, nil, yes, π, ∞]
+#        ^^^^ constant.language.wasp
+#              ^^^^^ constant.language.wasp
+#                     ^ constant.language.wasp
+#                        ^^^ constant.language.wasp
+#                             ^^^ constant.language.wasp
+#                                  ^ constant.language.wasp
+#                                     ^ constant.language.wasp
+
+if x > 1 then print "big" else print "small"
+# <- keyword.control.wasp
+#        ^^^^ keyword.control.wasp
+#             ^^^^^ support.function.builtin.wasp
+#                         ^^^^ keyword.control.wasp
+
+while i < 10 do i++
+# <- keyword.control.wasp
+#            ^^ keyword.control.wasp
+#                ^^ keyword.operator.arithmetic.wasp
+
+for item in items { print item }
+# <- keyword.control.wasp
+#        ^^ keyword.control.wasp
+#                 ^^^^^^^^^^^^^^ meta.block.wasp
+#           ^^^^^ - entity.name.tag
+
+job = go fetch_data()
+#     ^^ keyword.control.wasp
+#        ^^^^^^^^^^ variable.function.wasp
+result = await job
+#        ^^^^^ keyword.control.wasp
+
+try risky() catch e: print e
+# <- keyword.control.wasp
+#           ^^^^^ keyword.control.wasp
+
+def square x := x * x
+# <- keyword.declaration.function.wasp
+#   ^^^^^^ entity.name.function.wasp
+#            ^^ keyword.operator.definition.wasp
+
+fn double(x) = x * 2
+# <- keyword.declaration.function.wasp
+#  ^^^^^^ entity.name.function.wasp
+
+area := width * height
+# <- entity.name.function.wasp
+#    ^^ keyword.operator.definition.wasp
+
+f(x) := x + 1
+# <- entity.name.function.wasp
+
+use math
+# <- keyword.control.import.wasp
+
+global counter = 0
+# <- storage.modifier.wasp
+
+nonlocal total
+# <- storage.modifier.wasp
+
+data a+b
+# <- keyword.declaration.wasp
+
+class Point { x: int y: float }
+# <- keyword.declaration.wasp
+#     ^^^^^ entity.name.type.wasp
+#             ^ entity.name.key.wasp
+#                ^^^ storage.type.wasp
+#                       ^^^^^ storage.type.wasp
+
+Person {
+# <- entity.name.tag.wasp
+    name: "Alice"
+#   ^^^^ entity.name.key.wasp
+#       ^ punctuation.separator.key-value.wasp
+    age: 30
+    hobbies: [ "reading", 'hiking' ]
+#                         ^^^^^^^^ string.quoted.single.wasp
+}
+
+t = text(42) + int("3") as float
+#   ^^^^ storage.type.wasp
+#              ^^^ storage.type.wasp
+#                       ^^ keyword.operator.word.wasp
+#                          ^^^^^ storage.type.wasp
+
+ok = a and b or not c xor d
+#      ^^^ keyword.operator.word.wasp
+#            ^^ keyword.operator.word.wasp
+#               ^^^ keyword.operator.word.wasp
+#                     ^^^ keyword.operator.word.wasp
+
+r = √9 + 3² + a ≈ b
+#   ^ keyword.operator.wasp
+#         ^ keyword.operator.wasp
+#               ^ keyword.operator.wasp
+
+words = "a b".split(" ").map(upper) | join ","
+#             ^^^^^ support.function.builtin.wasp
+#                        ^^^ support.function.builtin.wasp
+#                            ^^^^^ support.function.builtin.wasp
+#                                   ^ keyword.operator.pipe.wasp
+#                                     ^^^^ support.function.builtin.wasp
+
+s = " padded ".trim() + "x".strip() + now()
+#              ^^^^ support.function.builtin.wasp
+#                           ^^^^^ support.function.builtin.wasp
+#                                     ^^^ support.function.builtin.wasp
+
+block := x + y
+run = block!
+#          ^ keyword.operator.run.wasp
+same = a != b
+#        ^^ keyword.operator.comparison.wasp
+
+value = maybe?.field ?? $0 + @attr
+#            ^^ keyword.operator.wasp
+#                    ^^ keyword.operator.wasp
+#                       ^^ variable.parameter.wasp
+#                            ^^^^^ entity.other.attribute-name.wasp
+
+xs#1
+# ^ keyword.operator.wasp
+
+oops = )
+#      ^ invalid.illegal.stray-bracket-end.wasp
