@@ -3,7 +3,8 @@ wasp sublime text plugin
 
 ## Wasp.sublime-syntax
 
-Highlighting for wasp / warp (`.wasp`, `.warp`): keywords, word operators, built-in functions, types, constants,
+The one syntax of the package (Angle.sublime-syntax is retired), for wasp / warp and angle
+(`.wasp`, `.warp`, `.a`, `.an`, `.ang`, `.angl`, `.angle`): keywords, word operators, built-in functions, types, constants,
 units and durations, double- and single-quoted strings with escapes and `$name` / `${…}` / `\(…)` holes, codepoints,
 comments (`//`, `#`, nesting `/* */` and `/# #/`), keys, tags, `:=` getters, `|` pipes and `!` run-time blocks.
 
