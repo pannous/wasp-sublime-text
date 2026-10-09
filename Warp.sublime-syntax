@@ -95,7 +95,7 @@ contexts:
       push: hash_block_comment
 
   ##############################################################################
-  # strings: "…" interpolates (`${expr}`, `$(expr)`, `\(expr)`; a bare `$name` stays text, decision 911), '…' does not; both escape (`\n`, `\u{e9}`, `\:alpha`);
+  # strings: "…" interpolates (`${expr}`, `$(expr)`, `\(expr)`; a bare `$name` stays text, decision P6), '…' does not; both escape (`\n`, `\u{e9}`, `\:alpha`);
   # a one-character literal is a codepoint whichever quote it uses; `p's name` is possessive, no quote
 
   strings:
