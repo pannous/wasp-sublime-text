@@ -35,7 +35,7 @@ url = "http://wasp.pannous.com"
 
 greeting = "hello $name and ${1+2} or \(it) \n"
 #          ^ string.quoted.double.warp punctuation.definition.string.begin.warp
-#                 ^^^^^ variable.other.interpolated.warp
+#                 ^^^^^ string.quoted.double.warp - variable - meta.interpolation
 #                           ^^^^^^ meta.interpolation.warp - string
 #                             ^ constant.numeric.warp
 #                                     ^^^^^ meta.interpolation.warp

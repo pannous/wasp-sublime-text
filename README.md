@@ -6,7 +6,7 @@ Sublime Text package for warp (and wasp, angle)
 The one syntax of the package (Angle.sublime-syntax is retired), for wasp / warp and angle
 (`.wasp`, `.warp`, `.a`, `.an`, `.ang`, `.angl`, `.angle`): keywords, soft keywords (`keyword.other.soft`: emit, on,
 whenever, where, fields …), implicit names (`variable.language`: it, self, result), word operators, built-in functions, types, constants,
-units and durations, double- and single-quoted strings with escapes and `$name` / `${…}` / `$(…)` / `\(…)` / `\{…}` holes, codepoints,
+units and durations, double- and single-quoted strings with escapes and `${…}` / `$(…)` / `\(…)` / `\{…}` holes (a bare `$name` stays text, as in warp), codepoints,
 comments (`// `, `# `, nesting `/* */` and `/# #/`), keys, tags, `:=` getters, `|` pipes and `!` run-time blocks.
 
 The word lists are generated from warp's sources (~/dev/angles/warp), never edited by hand:
