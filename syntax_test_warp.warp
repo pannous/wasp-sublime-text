@@ -222,3 +222,7 @@ effects of f; p.fields; undo x
 total = self.n + result
 #       ^^^^ variable.language.warp
 #                ^^^^^^ variable.language.warp
+
+ok = ⊤ and not ❌
+#    ^ constant.language.warp
+#              ^ constant.language.warp

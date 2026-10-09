@@ -8,7 +8,8 @@ the completions file. A source that no longer exists is a loud error: warp moved
 Two more loud errors keep the lists honest: a hard or soft keyword of P165 (src/lowering/soft_keywords.rs) that no
 scope colors, and a keyword word that wiki/keyword.md does not document.
 
-usage: scripts/update_words.py [path to warp checkout]   (default ~/dev/angles/warp)
+usage: scripts/update_words.py [path to warp checkout] [keyword page]
+       (defaults ~/dev/angles/warp and the wiki of the main checkout: worktrees have no wiki/)
 """
 import json
 import re
@@ -126,7 +127,7 @@ P165_LISTS = [("src/lowering/soft_keywords.rs", "HARD_KEYWORDS"), ("src/lowering
 # the scopes of keywords proper, each word of which wiki/keyword.md documents (types, built-ins and units have pages of their own)
 DOCUMENTED_SCOPES = ["constant_language", "variable_language", "keyword_control", "keyword_function", "keyword_declaration",
                      "keyword_import", "storage_modifier", "keyword_operator_word", "keyword_soft"]
-KEYWORD_PAGE = WARP / "wiki" / "keyword.md"
+KEYWORD_PAGE = Path(sys.argv[2] if len(sys.argv) > 2 else "~/dev/angles/warp/wiki/keyword.md").expanduser()
 # a word in several scopes keeps the first, in this order (`in` is control flow before it is an operator)
 SCOPE_ORDER = list(SOURCES)
 CALL_CHECKED = "runtime_tables"

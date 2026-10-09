@@ -92,8 +92,6 @@
 		{"trigger": "split\tbuilt-in", "contents": "split($1)"},
 		{"trigger": "sqrt\tbuilt-in", "contents": "sqrt($1)"},
 		{"trigger": "starts_with\tbuilt-in", "contents": "starts_with($1)"},
-		{"trigger": "std_io\tbuilt-in", "contents": "std_io($1)"},
-		{"trigger": "std_pure\tbuilt-in", "contents": "std_pure($1)"},
 		{"trigger": "strip\tbuilt-in", "contents": "strip($1)"},
 		{"trigger": "sum\tbuilt-in", "contents": "sum($1)"},
 		{"trigger": "system_value\tbuilt-in", "contents": "system_value($1)"},
