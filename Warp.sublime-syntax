@@ -120,10 +120,10 @@ contexts:
     - match: '"'
       scope: punctuation.definition.string.end.warp
       pop: true
-    - match: '\$\{'
+    - match: '\$\{|\\\{'
       scope: punctuation.section.interpolation.begin.warp
       push: brace_interpolation
-    - match: '\\\('
+    - match: '\$\(|\\\('
       scope: punctuation.section.interpolation.begin.warp
       push: paren_interpolation
     - match: '\$\$'

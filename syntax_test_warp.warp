@@ -32,6 +32,13 @@ greeting = "hello $name and ${1+2} or \(it) \n"
 #                                       ^^ variable.language.warp
 #                                           ^^ constant.character.escape.warp
 
+others = "$(1+2) \{3} done"
+#         ^^^^^^ meta.interpolation.warp - string
+#           ^ constant.numeric.warp
+#                ^^^^ meta.interpolation.warp - string
+#                  ^ constant.numeric.warp
+#                     ^^^^ string.quoted.double.warp - meta.interpolation
+
 single = 'no $holes here\t'
 #        ^^^^^^^^^^^^^^^^^^ string.quoted.single.warp
 #            ^^^^^^ - variable
