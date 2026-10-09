@@ -223,6 +223,17 @@ total = self.n + result
 #       ^^^^ variable.language.warp
 #                ^^^^^^ variable.language.warp
 
+on change x { print old; signal ping }
+#  ^^^^^^ keyword.other.soft.warp
+#                   ^^^ variable.language.warp
+#                        ^^^^^^ keyword.other.soft.warp
+
+8 divided by 2 is at least 4; assert check
+# ^^^^^^^ keyword.operator.word.warp
+#                 ^^ keyword.operator.word.warp
+#                    ^^^^^ keyword.operator.word.warp
+#                                    ^^^^^ keyword.control.warp
+
 ok = ⊤ and not ❌
 #    ^ constant.language.warp
 #              ^ constant.language.warp

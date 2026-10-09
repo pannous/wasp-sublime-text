@@ -1,0 +1,7 @@
+{
+	// merged into the user's Breakers scheme (Sublime Text 4 combines color schemes of the same name):
+	// warp's soft and contextual keywords in a lighter tone of the keyword color
+	"rules": [
+		{"name": "warp soft keyword", "scope": "keyword.other.soft.warp", "foreground": "hsl(300, 28%, 78%)"}
+	]
+}

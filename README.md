@@ -14,8 +14,14 @@ The word lists are generated from warp's sources (~/dev/angles/warp), never edit
     scripts/update_words.py [path to warp]   # rewrites the GENERATED variables and Warp.sublime-completions
     scripts/check_syntax.py                  # YAML, regexes, completions JSON and syntax_test_warp.warp, headless
 
-`update_words.py` fails when a hard or soft keyword (warp's src/lowering/soft_keywords.rs) gets no scope, or when a
-keyword is missing from warp's wiki/keyword.md, the page that documents them all.
+`update_words.py` fails when a hard or soft keyword (warp's src/lowering/soft_keywords.rs) gets no scope, when a
+keyword is missing from warp's wiki/keyword.md, the page that documents them all, or when a word of that page's tables
+gets no scope (contextual words warp matches inline are read from the page itself; articles `a`, `an`, `the` stay plain).
+
+Soft and contextual keywords have their own tone in Sublime Text 4's default schemes: Mariana.sublime-color-scheme and
+Breakers.sublime-color-scheme here are merged into the schemes of the same name and color `keyword.other.soft.warp` a
+lighter shade of the keyword color. Another scheme colors it like the other keywords unless a rule for
+`keyword.other.soft` is added to Packages/User/<scheme>.sublime-color-scheme.
 
 `check_syntax.py` runs the syntax tests with syntect's `syntest`
 (`git clone https://github.com/trishume/syntect && cargo build --release --example syntest`, or set `$SYNTEST`).

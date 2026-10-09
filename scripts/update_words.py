@@ -29,20 +29,23 @@ USAGE_CORPUS = ["tests", "samples", "wiki"]
 # the compiler and its runtime crate (the host words' names live there)
 RUST_ROOTS = ["src", "crates/*/src"]
 # words some table lists that warp code never writes as such: compiler-internal or too generic to color
-EXCLUDED = {"main", "value", "signal", "event", "fetch", "fd_write", "puti", "putl", "putf",
+# (articles: `3 is an int` colors `an` only at the cost of every variable named a)
+EXCLUDED = {"main", "fetch", "fd_write", "puti", "putl", "putf",
             "C", "a", "an", "the", "number", "_", "st", "run_block", "foreign_call", "map_entries"}
 
 # Each source: (file in warp, constant name[, "first" | "rest": the first word of each tuple/struct element | the others])
 #              ("fn", file, function name): the string and char literals of that function's body
 #              ("calls", directory, function name): the literal arguments of calls to that function
 #              ("words", word, …): words with no table in warp, kept only while they are a literal in warp's sources
+#              ("page", section): the words and aliases of that section's table in wiki/keyword.md (KEYWORD_PAGE),
+#              for contextual words warp matches inline, without a table to read
 SOURCES = {
-	"constant_language": [("fn", "src/warp_parser/mod.rs", "check_constants"), ("words", "∞")],
+	"constant_language": [("fn", "src/warp_parser/mod.rs", "check_constants"), ("words", "∞"), ("page", "Constants")],
 	# implicit names: before the types, which list `result` too
 	"variable_language": [
 		("src/warp_parser/mod.rs", "IT_WORD"), ("src/warp_parser/mod.rs", "RECEIVER_WORD"),
 		("src/lowering/class_methods.rs", "RECEIVER_ALIASES"), ("src/lowering/class_methods.rs", "SUPER"),
-		("src/lowering/result_word.rs", "RESULT_WORD"),
+		("src/lowering/result_word.rs", "RESULT_WORD"), ("page", "Implicit names"),
 	],
 	"keyword_control": [
 		("src/warp_parser/mod.rs", "STATEMENT_MODIFIERS", "first"), ("src/warp_parser/mod.rs", "ELSE_IF_WORDS"),
@@ -51,7 +54,7 @@ SOURCES = {
 		("src/analyzer/mod.rs", "RETURNING_KEYWORDS"), ("src/lowering/switch.rs", "SWITCH_WORDS"),
 		("src/lowering/switch.rs", "DEFAULT_KEYS"), ("src/lowering/declarations.rs", "TASK_WORDS"),
 		("src/pipeline.rs", "RAISE_WORDS"), ("src/warp_parser/mod.rs", "FINALLY_KEYWORD"),
-		("words", "for", "loop", "break", "continue", "try", "case", "once", "assert", "with"),
+		("words", "for", "loop", "break", "continue", "try", "case", "once", "assert", "with"), ("page", "Control flow"),
 	],
 	"keyword_function": [("src/operators.rs", "FUNCTION_KEYWORDS")],
 	"keyword_declaration": [
@@ -63,7 +66,7 @@ SOURCES = {
 		("src/warp_parser/mod.rs", "DEFINITION_MODIFIERS"), ("src/warp_parser/mod.rs", "DECLARATION_MODIFIERS"),
 		("src/modules.rs", "DECLARATION_KEYWORDS"), ("src/analyzer/mod.rs", "CONSTANT_KEYWORDS"),
 		("src/warp_parser/mod.rs", "NONLOCAL_WORD"), ("src/lowering/shared_arrays.rs", "SHARED_WORDS"),
-		("src/warp_parser/mod.rs", "FOREIGN_MODIFIERS"),
+		("src/warp_parser/mod.rs", "FOREIGN_MODIFIERS"), ("page", "Modifiers"),
 	],
 	"keyword_operator_word": [
 		("fn", "src/operators.rs", "as_str"), ("calls", "src/warp_parser", "matches_keyword"),
@@ -71,7 +74,7 @@ SOURCES = {
 		("src/warp_parser/mod.rs", "SIMILARITY_WORDS"), ("src/warp_parser/mod.rs", "IS_WORD"),
 		("src/warp_parser/mod.rs", "UPTO"), ("src/warp_parser/mod.rs", "TIMES_WORD"), ("src/warp_parser/mod.rs", "TEST_WORDS"),
 		("src/warp_parser/mod.rs", "EVEN_WORD"), ("src/warp_parser/mod.rs", "ODD_WORD"), ("src/effects.rs", "QUERY_WORDS"),
-		("src/lowering/run_time_blocks.rs", "INTERPRET"), ("words", "mod", "rem", "div", "of", "by", "has", "contains"),
+		("src/lowering/run_time_blocks.rs", "INTERPRET"), ("words", "mod", "rem", "div", "of", "by", "has", "contains"), ("page", "Operators as words"),
 	],
 	"storage_type": [
 		("fn", "src/analyzer/checks.rs", "builtin_type_kind"), ("src/warp_parser/mod.rs", "LITERAL_NUMBER_TYPES"),
@@ -120,8 +123,11 @@ SOURCES = {
 		("src/lowering/references.rs", "REFERENCE_WORD"), ("src/lowering/serve.rs", "SERVE_WORD"),
 		("src/lowering/serve.rs", "SERVER_WORD"), ("src/lowering/routes.rs", "ROUTE_WORD"),
 		("src/lowering/serve.rs", "DATABASE_WORDS"),
+		*[("page", section) for section in ("Declarations", "Phrases on lists", "Events and signals", "Tasks",
+		                                    "Reflection", "Server and database", "Modules")],
 	],
 }
+PAGE_SOURCES = [source for sources in SOURCES.values() for source in sources if source[0] == "page"]
 # P165's two lists: each of their words must land in some scope
 P165_LISTS = [("src/lowering/soft_keywords.rs", "HARD_KEYWORDS"), ("src/lowering/soft_keywords.rs", "SOFT_KEYWORDS")]
 # the scopes of keywords proper, each word of which wiki/keyword.md documents (types, built-ins and units have pages of their own)
@@ -256,8 +262,21 @@ class RustSources:
 		return any(f'"{word}"' in code or f"'{word}'" in code for code in self.files.values())
 
 
+def page_words(section):
+	"""The words of the `word` and `aliases` columns of a ### section's table: `same as` gives same and as"""
+	text = KEYWORD_PAGE.read_text()
+	heading = re.search(rf"^### {re.escape(section)}$", text, re.M)
+	if not heading:
+		raise KeyError(f"{KEYWORD_PAGE} has no section ### {section}")
+	body = text[heading.end():].split("\n#", 1)[0]
+	rows = [line.split("|")[1:3] for line in body.splitlines() if line.startswith("|") and not line.startswith(("| word", "|---"))]
+	return [word.strip("`") for cells in rows for cell in cells for word in re.split(r"[\s,]+", cell) if word.strip("`…")]
+
+
 def source_words(rust, source):
 	kind = source[0]
+	if kind == "page":
+		return page_words(source[1])
 	if kind == "fn":
 		return rust.function_words(source[1], source[2])
 	if kind == "calls":
@@ -325,6 +344,13 @@ def undocumented_keywords(words):
 	               if not re.search(rf"(?<![\w]){re.escape(word)}(?![\w])", page)})
 
 
+def uncolored_page_words(words):
+	"""Words of the keyword page's tables that no scope colors (glyphs and `…` aside)"""
+	colored = {word for found in words.values() for word in found}
+	page = {word for source in PAGE_SOURCES for word in page_words(source[1])}
+	return sorted(word for word in page if WORD.match(word) and word not in EXCLUDED and word not in colored)
+
+
 def generated_variables(words, syntax):
 	"""A variable per word list the syntax names or that has words; an empty one never matches"""
 	lines = [BEGIN_MARK, "  # from warp's sources, see SOURCES in scripts/update_words.py; rerun instead of editing"]
@@ -356,7 +382,8 @@ if __name__ == "__main__":
 	for scope, found in found_words.items():
 		print(f"{scope} ({len(found)}): {' '.join(sorted(found))}")
 	problems = {"P165 keywords no scope colors": uncolored_keywords(rust_sources, found_words),
-	            f"keywords {KEYWORD_PAGE} does not document": undocumented_keywords(found_words)}
+	            f"keywords {KEYWORD_PAGE} does not document": undocumented_keywords(found_words),
+	            f"words of {KEYWORD_PAGE} no scope colors": uncolored_page_words(found_words)}
 	for problem, found in problems.items():
 		if found:
 			print(f"error: {problem}: {' '.join(found)}", file=sys.stderr)
