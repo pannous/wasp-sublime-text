@@ -1,5 +1,5 @@
 {
-    "scope": "source.wasp",
+    "scope": "source.warp",
     "completions": [
        {"trigger": "return", "contents": "return $0"},
         {"trigger": "require", "contents": "require('$0"},

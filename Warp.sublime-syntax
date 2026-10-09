@@ -2,7 +2,7 @@
 ---
 # wasp / warp: https://github.com/pannous/wasp, the Rust implementation ~/dev/angles/warp (its parser is the reference).
 # The word lists between the GENERATED marks come from warp's sources: rerun scripts/update_words.py, don't edit them.
-name: Wasp
+name: Warp
 file_extensions:
   - a
   - an
@@ -12,7 +12,7 @@ file_extensions:
   - wasp
   - warp
 first_line_match: ^#!.*\b(wasp|warp)\b
-scope: source.wasp
+scope: source.warp
 
 variables:
   identifier: '[A-Za-z_][A-Za-z0-9_]*'
@@ -27,11 +27,11 @@ variables:
   keyword_function: (?:function|define|func|def|fun|fn)
   keyword_declaration: (?:capability|interface|prototype|typeclass|protocol|feature|aspect|record|struct|class|trait|data|enum)
   keyword_import: (?:include|require|import|use)
-  storage_modifier: (?:synchronized|thread_local|constexpr|protected|transient|abstract|constant|external|internal|nonlocal|override|volatile|mutable|private|virtual|atomic|export|extern|global|inline|native|public|shared|static|const|final|let|mut|val|var)
-  keyword_operator_word: (?:approximately|interpret|undefined|contains|effects|missing|unknown|absent|failed|circa|times|cbrt|even|nand|sqrt|upto|abs|all|and|div|has|mod|not|odd|rem|xor|as|be|by|is|of|or|to)
+  storage_modifier: (?:synchronized|thread_local|constexpr|protected|transient|abstract|constant|external|internal|nonlocal|override|volatile|mutable|private|virtual|atomic|export|extern|global|inline|native|public|shared|static|stored|const|final|local|let|mut|val|var)
+  keyword_operator_word: (?:approximately|interpret|undefined|contains|effects|extends|missing|unknown|absent|failed|lambda|after|circa|times|down|even|nand|upto|all|and|div|has|mod|not|odd|rem|xor|as|be|by|is|of|or|to)
   keyword_operator_word_glyphs: (?:±|²|³|·|‐|‑|‒|–|—|―|‖|−|√|∛|∧|∨|≈|≟|≡|⊻|⊼|⋀|⋁|⋅|﹦)
-  storage_type: (?:codepoint|duration|rational|boolean|closure|complex|integer|String|double|option|result|string|symbol|array|error|exact|float|tuple|bool|byte|char|date|fast|list|long|node|real|text|any|f32|f64|i16|i32|i64|int|map|set|str|u16|u32|u64|i8|u8)
-  support_function: (?:is_alphanumeric|round_half_even|round_half_up|random_below|starts_with|byte_slice|codepoint|ends_with|is_letter|lowercase|uppercase|download|includes|index_of|is_alnum|is_alpha|is_digit|is_error|byte_at|isalnum|isalpha|isdigit|ordinal|println|replace|reverse|warning|append|filter|insert|length|random|reduce|remove|unwrap|values|chars|clock|clone|count|error|first|floor|items|lower|print|range|round|sleep|slice|split|strip|upper|ceil|copy|each|exit|find|fold|join|keys|last|push|puts|read|size|sort|trim|type|add|any|chr|cos|exp|get|hex|len|log|map|max|min|now|ord|pop|sin|sum|tan|ln)
+  storage_type: (?:codepoint|duration|rational|boolean|closure|float32|integer|String|double|option|result|string|symbol|array|error|exact|float|tuple|bool|byte|char|date|fast|list|long|node|real|text|any|f32|f64|i16|i32|i64|int|map|set|str|u16|u32|u64|i8|u8)
+  support_function: (?:is_alphanumeric|round_half_even|round_half_up|random_below|signal_daily|system_value|gpu_compute|starts_with|byte_slice|gpu_render|map_values|certainly|codepoint|ends_with|is_letter|lowercase|signal_at|text_form|uppercase|download|includes|index_of|is_alnum|is_alpha|is_digit|is_error|possibly|std_pure|byte_at|isalnum|isalpha|isdigit|ordinal|println|replace|reverse|warning|append|filter|insert|length|notify|random|reduce|remove|sorted|std_io|unwrap|values|chars|clock|clone|count|error|first|floor|items|lower|paint|print|range|round|sleep|slice|split|strip|upper|ceil|copy|each|exit|find|fold|join|keys|last|list|push|puts|read|size|sort|sqrt|trim|type|abs|add|any|chr|cos|exp|get|hex|len|log|map|max|min|now|ord|pop|sin|sum|tan|ln)
   time_units: (?:minutes|seconds|minute|months|second|hours|month|weeks|years|days|hour|week|year|day)
   units: (?:millisecond|centimeter|characters|codepoints|millimeter|kilometer|milligram|kilogram|bytes|meter|metre|gram|AD|cm|kg|km|mg|mm|ms|g|h|m|s)
   # END GENERATED
@@ -56,36 +56,36 @@ contexts:
 
   comments:
     - match: '(?<![A-Za-z0-9_)\]:])//'
-      scope: punctuation.definition.comment.wasp
+      scope: punctuation.definition.comment.warp
       push: line_comment
     - match: '^\s*(#)(?=[ \t!#]|$|(?:{{keyword_import}}){{word_end}})'
       captures:
-        1: punctuation.definition.comment.wasp
+        1: punctuation.definition.comment.warp
       push: line_comment
     - match: '/\*'
-      scope: punctuation.definition.comment.begin.wasp
+      scope: punctuation.definition.comment.begin.warp
       push: star_block_comment
     - match: '/#'
-      scope: punctuation.definition.comment.begin.wasp
+      scope: punctuation.definition.comment.begin.warp
       push: hash_block_comment
 
   line_comment:
-    - meta_scope: comment.line.wasp
+    - meta_scope: comment.line.warp
     - match: '$\n?'
       pop: true
 
   star_block_comment:
-    - meta_scope: comment.block.wasp
+    - meta_scope: comment.block.warp
     - match: '\*/'
-      scope: punctuation.definition.comment.end.wasp
+      scope: punctuation.definition.comment.end.warp
       pop: true
     - match: '/\*'
       push: star_block_comment
 
   hash_block_comment:
-    - meta_scope: comment.block.wasp
+    - meta_scope: comment.block.warp
     - match: '#/'
-      scope: punctuation.definition.comment.end.wasp
+      scope: punctuation.definition.comment.end.warp
       pop: true
     - match: '/#'
       push: hash_block_comment
@@ -96,69 +96,69 @@ contexts:
 
   strings:
     - match: "(?<=[A-Za-z0-9_])'s(?= [A-Za-z_])"
-      scope: keyword.operator.possessive.wasp
+      scope: keyword.operator.possessive.warp
     - match: '"(?:[^"\\$]|\\.)"'
-      scope: string.quoted.double.wasp constant.character.codepoint.wasp
+      scope: string.quoted.double.warp constant.character.codepoint.warp
     - match: "'(?:[^'\\\\]|\\\\.)'"
-      scope: string.quoted.single.wasp constant.character.codepoint.wasp
+      scope: string.quoted.single.warp constant.character.codepoint.warp
     - match: '"'
-      scope: punctuation.definition.string.begin.wasp
+      scope: punctuation.definition.string.begin.warp
       push: double_quoted
     - match: "'"
-      scope: punctuation.definition.string.begin.wasp
+      scope: punctuation.definition.string.begin.warp
       push: single_quoted
     - match: '«'
-      scope: punctuation.definition.string.begin.wasp
+      scope: punctuation.definition.string.begin.warp
       push: guillemet_quoted
 
   escapes:
     - match: '\\u\{\h+\}|\\:[A-Za-z]+|\\.'
-      scope: constant.character.escape.wasp
+      scope: constant.character.escape.warp
 
   double_quoted:
-    - meta_scope: string.quoted.double.wasp
+    - meta_scope: string.quoted.double.warp
     - match: '"'
-      scope: punctuation.definition.string.end.wasp
+      scope: punctuation.definition.string.end.warp
       pop: true
     - match: '\$\{'
-      scope: punctuation.section.interpolation.begin.wasp
+      scope: punctuation.section.interpolation.begin.warp
       push: brace_interpolation
     - match: '\\\('
-      scope: punctuation.section.interpolation.begin.wasp
+      scope: punctuation.section.interpolation.begin.warp
       push: paren_interpolation
     - match: '\$\$'
-      scope: constant.character.escape.wasp
+      scope: constant.character.escape.warp
     - match: '\${{identifier}}'
-      scope: variable.other.interpolated.wasp
+      scope: variable.other.interpolated.warp
     - include: escapes
 
   brace_interpolation:
     - clear_scopes: 1
-    - meta_scope: meta.interpolation.wasp
+    - meta_scope: meta.interpolation.warp
     - match: '\}'
-      scope: punctuation.section.interpolation.end.wasp
+      scope: punctuation.section.interpolation.end.warp
       pop: true
     - include: statements
 
   paren_interpolation:
     - clear_scopes: 1
-    - meta_scope: meta.interpolation.wasp
+    - meta_scope: meta.interpolation.warp
     - match: '\)'
-      scope: punctuation.section.interpolation.end.wasp
+      scope: punctuation.section.interpolation.end.warp
       pop: true
     - include: statements
 
   single_quoted:
-    - meta_scope: string.quoted.single.wasp
+    - meta_scope: string.quoted.single.warp
     - match: "'"
-      scope: punctuation.definition.string.end.wasp
+      scope: punctuation.definition.string.end.warp
       pop: true
     - include: escapes
 
   guillemet_quoted:
-    - meta_scope: string.quoted.other.wasp
+    - meta_scope: string.quoted.other.warp
     - match: '[»«]'
-      scope: punctuation.definition.string.end.wasp
+      scope: punctuation.definition.string.end.warp
       pop: true
     - include: escapes
 
@@ -168,39 +168,39 @@ contexts:
   numbers:
     - match: '{{word_start}}(0[xX]\h[\h_]*|0[bB][01][01_]*|(?:\d[\d_]*(?:\.\d[\d_]*)?|\.\d[\d_]*)(?:[eE][+-]?\d+)?)(?:(st|nd|rd|th){{word_end}}|\s*((?:{{units}}|{{time_units}}){{word_end}}))?'
       captures:
-        1: constant.numeric.wasp
-        2: constant.numeric.suffix.ordinal.wasp
-        3: keyword.other.unit.wasp
+        1: constant.numeric.warp
+        2: constant.numeric.suffix.ordinal.warp
+        3: keyword.other.unit.warp
 
   ##############################################################################
 
   groups:
     - match: '\('
-      scope: punctuation.section.group.begin.wasp
+      scope: punctuation.section.group.begin.warp
       push:
-        - meta_scope: meta.group.wasp
+        - meta_scope: meta.group.warp
         - match: '\)'
-          scope: punctuation.section.group.end.wasp
+          scope: punctuation.section.group.end.warp
           pop: true
         - include: statements
     - match: '\['
-      scope: punctuation.section.brackets.begin.wasp
+      scope: punctuation.section.brackets.begin.warp
       push:
-        - meta_scope: meta.brackets.wasp
+        - meta_scope: meta.brackets.warp
         - match: '\]'
-          scope: punctuation.section.brackets.end.wasp
+          scope: punctuation.section.brackets.end.warp
           pop: true
         - include: statements
     - match: '\{'
-      scope: punctuation.section.block.begin.wasp
+      scope: punctuation.section.block.begin.warp
       push:
-        - meta_scope: meta.block.wasp
+        - meta_scope: meta.block.warp
         - match: '\}'
-          scope: punctuation.section.block.end.wasp
+          scope: punctuation.section.block.end.warp
           pop: true
         - include: statements
     - match: '[)\]}]'
-      scope: invalid.illegal.stray-bracket-end.wasp
+      scope: invalid.illegal.stray-bracket-end.warp
 
   ##############################################################################
   # definitions: `def square x`, `fn f(x)`, `class Point`, getters `area := w*h`, `f(x) := …`, tags `Person { … }`
@@ -208,88 +208,88 @@ contexts:
   definitions:
     - match: '{{word_start}}((?:{{keyword_function}}))\s+({{identifier}})'
       captures:
-        1: keyword.declaration.function.wasp
-        2: entity.name.function.wasp
+        1: keyword.declaration.function.warp
+        2: entity.name.function.warp
     - match: '{{word_start}}((?:{{keyword_declaration}}))\s+({{identifier}})'
       captures:
-        1: keyword.declaration.wasp
-        2: entity.name.type.wasp
+        1: keyword.declaration.warp
+        2: entity.name.type.warp
     - match: '{{word_start}}({{identifier}})(?=\s*(?:\([^()]*\)\s*)?:=)'
-      scope: entity.name.function.wasp
+      scope: entity.name.function.warp
     - match: '(?:^|(?<=[:=(,\[{]))\s*(?!(?:{{keyword_control}}|{{keyword_function}}|{{keyword_declaration}}|{{storage_modifier}}){{word_end}})({{identifier}})(?=\s*\{)'
       captures:
-        1: entity.name.tag.wasp
+        1: entity.name.tag.warp
 
   # keys: `name: "Alice"`, not `::` or `:=`, not control words (`else: …`)
   keys:
     - match: '{{word_start}}(?!(?:{{keyword_control}}){{word_end}})({{identifier}})\s*(:)(?![:=])'
       captures:
-        1: entity.name.key.wasp
-        2: punctuation.separator.key-value.wasp
+        1: entity.name.key.warp
+        2: punctuation.separator.key-value.warp
 
   ##############################################################################
 
   words:
     - match: '{{word_start}}(?i:{{constant_language}}){{word_end}}'
-      scope: constant.language.wasp
+      scope: constant.language.warp
     - match: '{{constant_language_glyphs}}'
-      scope: constant.language.wasp
+      scope: constant.language.warp
     - match: '{{word_start}}(?:{{keyword_control}}){{word_end}}'
-      scope: keyword.control.wasp
+      scope: keyword.control.warp
     - match: '{{word_start}}(?:{{keyword_function}}){{word_end}}'
-      scope: keyword.declaration.function.wasp
+      scope: keyword.declaration.function.warp
     - match: '{{word_start}}(?:{{keyword_declaration}}){{word_end}}'
-      scope: keyword.declaration.wasp
+      scope: keyword.declaration.warp
     - match: '{{word_start}}(?:{{keyword_import}}){{word_end}}'
-      scope: keyword.control.import.wasp
+      scope: keyword.control.import.warp
     - match: '{{word_start}}(?:{{storage_modifier}}){{word_end}}'
-      scope: storage.modifier.wasp
+      scope: storage.modifier.warp
     - match: '{{word_start}}(?:{{keyword_operator_word}}){{word_end}}'
-      scope: keyword.operator.word.wasp
+      scope: keyword.operator.word.warp
     - match: '{{keyword_operator_word_glyphs}}'
-      scope: keyword.operator.wasp
+      scope: keyword.operator.warp
     # `xs.map(f)`, `map(xs, f)`: a call of a word that also names a type (`map`, `text`) is the function
     - match: '(?<=\.)(?:{{support_function}}){{word_end}}|{{word_start}}(?:{{support_function}})(?=\()'
-      scope: support.function.builtin.wasp
+      scope: support.function.builtin.warp
     - match: '{{word_start}}(?:{{storage_type}}){{word_end}}'
-      scope: storage.type.wasp
+      scope: storage.type.warp
     - match: '{{word_start}}(?:{{support_function}}){{word_end}}'
-      scope: support.function.builtin.wasp
+      scope: support.function.builtin.warp
     - match: '{{word_start}}it{{word_end}}'
-      scope: variable.language.wasp
+      scope: variable.language.warp
     - match: '\$(?:{{identifier}}|\d+)'
-      scope: variable.parameter.wasp
+      scope: variable.parameter.warp
     - match: '@{{identifier}}'
-      scope: entity.other.attribute-name.wasp
+      scope: entity.other.attribute-name.warp
     - match: '&(?={{identifier}})'
-      scope: keyword.operator.function-reference.wasp
+      scope: keyword.operator.function-reference.warp
     - match: '{{word_start}}{{identifier}}(?=\()'
-      scope: variable.function.wasp
+      scope: variable.function.warp
 
   ##############################################################################
 
   operators:
     - match: ':='
-      scope: keyword.operator.definition.wasp
+      scope: keyword.operator.definition.warp
     - match: '\|>|\|(?!\|)'
-      scope: keyword.operator.pipe.wasp
+      scope: keyword.operator.pipe.warp
     - match: '!!?(?!=)'
-      scope: keyword.operator.run.wasp
+      scope: keyword.operator.run.warp
     - match: '\?\.|\?\?|::|\.\.\.?|->|=>'
-      scope: keyword.operator.wasp
+      scope: keyword.operator.warp
     - match: '(?:[-+*/%^]|\*\*|&&|\|\||<<|>>)='
-      scope: keyword.operator.assignment.augmented.wasp
+      scope: keyword.operator.assignment.augmented.warp
     - match: '==|!=|<=|>=|<|>'
-      scope: keyword.operator.comparison.wasp
+      scope: keyword.operator.comparison.warp
     - match: '='
-      scope: keyword.operator.assignment.wasp
+      scope: keyword.operator.assignment.warp
     - match: '&&|\|\|'
-      scope: keyword.operator.logical.wasp
+      scope: keyword.operator.logical.warp
     - match: '\+\+|--|\*\*|//|[-+*/%^×÷]'
-      scope: keyword.operator.arithmetic.wasp
+      scope: keyword.operator.arithmetic.warp
     - match: '[#?:]'
-      scope: keyword.operator.wasp
+      scope: keyword.operator.warp
     - match: '[,;]'
-      scope: punctuation.separator.wasp
+      scope: punctuation.separator.warp
     - match: '\.'
-      scope: punctuation.accessor.wasp
+      scope: punctuation.accessor.warp
