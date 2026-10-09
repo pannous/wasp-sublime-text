@@ -20,6 +20,16 @@ x = 7//2 // floor division, then a comment
 #    ^^ keyword.operator.arithmetic.warp
 #        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.line.warp
 
+y = 7 //half
+#     ^^ keyword.operator.arithmetic.warp - comment
+
+z = [1, 2] # a hash comment after code, as warp's parser reads it
+#          ^^^^^^^^^^^^^^^^ comment.line.warp
+#        ^ - comment
+
+	# an indented hash comment
+#^ comment.line.warp punctuation.definition.comment.warp
+
 url = "http://wasp.pannous.com"
 #     ^^^^^^^^^^^^^^^^^^^^^^^^^ string.quoted.double.warp - comment
 

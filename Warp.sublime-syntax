@@ -53,14 +53,16 @@ contexts:
     - include: operators
 
   ##############################################################################
-  # comments: `// …` (not glued to an operand: `7//2` divides, `http://` is no comment), `# …` at a line start
-  # (also `#!`, `##`, `#use …`), and nesting `/* … */` and `/# … #/`
+  # comments: `// …` (not glued to an operand: `7//2` and `7 //2` divide, `http://` is no comment), `# …` after a
+  # line start or a space, also behind code (also `#!`, `##`, `#use …`), and nesting `/* … */` and `/# … #/`
 
   comments:
+    - match: '(?<=[A-Za-z0-9_)\]] )//(?=\S)'
+      scope: keyword.operator.arithmetic.warp
     - match: '(?<![A-Za-z0-9_)\]:])//'
       scope: punctuation.definition.comment.warp
       push: line_comment
-    - match: '^\s*(#)(?=[ \t!#]|$|(?:{{keyword_import}}){{word_end}})'
+    - match: '(?<!\S)(#)(?=[ \t!#]|$|(?:{{keyword_import}}){{word_end}})'
       captures:
         1: punctuation.definition.comment.warp
       push: line_comment
