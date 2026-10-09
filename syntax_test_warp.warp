@@ -205,3 +205,20 @@ xs#1
 
 oops = )
 #      ^ invalid.illegal.stray-bracket-end.warp
+
+whenever x > 1 { emit alarm }
+# <- keyword.other.soft.warp
+#                ^^^^ keyword.other.soft.warp
+
+nums where it > 2
+#    ^^^^^ keyword.other.soft.warp
+#          ^^ variable.language.warp
+
+effects of f; p.fields; undo x
+# <- keyword.operator.word.warp
+#               ^^^^^^ keyword.other.soft.warp
+#                       ^^^^ keyword.other.soft.warp
+
+total = self.n + result
+#       ^^^^ variable.language.warp
+#                ^^^^^^ variable.language.warp

@@ -5,6 +5,8 @@ warp (the Rust implementation of wasp) keeps its keywords, word operators, built
 tables scattered over src/: constants, match arms and parser calls. SOURCES names them per syntax scope; this script
 reads them, keeps the words a warp program can write, and rewrites the GENERATED block of the syntax's variables and
 the completions file. A source that no longer exists is a loud error: warp moved a table and SOURCES must follow.
+Two more loud errors keep the lists honest: a hard or soft keyword of P165 (src/lowering/soft_keywords.rs) that no
+scope colors, and a keyword word that wiki/keyword.md does not document.
 
 usage: scripts/update_words.py [path to warp checkout]   (default ~/dev/angles/warp)
 """
@@ -27,7 +29,7 @@ USAGE_CORPUS = ["tests", "samples", "wiki"]
 RUST_ROOTS = ["src", "crates/*/src"]
 # words some table lists that warp code never writes as such: compiler-internal or too generic to color
 EXCLUDED = {"main", "value", "signal", "event", "fetch", "fd_write", "puti", "putl", "putf",
-            "C", "it", "a", "an", "the", "number", "_", "st", "run_block", "foreign_call", "map_entries"}
+            "C", "a", "an", "the", "number", "_", "st", "run_block", "foreign_call", "map_entries"}
 
 # Each source: (file in warp, constant name[, "first" | "rest": the first word of each tuple/struct element | the others])
 #              ("fn", file, function name): the string and char literals of that function's body
@@ -35,13 +37,19 @@ EXCLUDED = {"main", "value", "signal", "event", "fetch", "fd_write", "puti", "pu
 #              ("words", word, …): words with no table in warp, kept only while they are a literal in warp's sources
 SOURCES = {
 	"constant_language": [("fn", "src/warp_parser/mod.rs", "check_constants"), ("words", "∞")],
+	# implicit names: before the types, which list `result` too
+	"variable_language": [
+		("src/warp_parser/mod.rs", "IT_WORD"), ("src/warp_parser/mod.rs", "RECEIVER_WORD"),
+		("src/lowering/class_methods.rs", "RECEIVER_ALIASES"), ("src/lowering/class_methods.rs", "SUPER"),
+		("src/lowering/result_word.rs", "RESULT_WORD"),
+	],
 	"keyword_control": [
 		("src/warp_parser/mod.rs", "STATEMENT_MODIFIERS", "first"), ("src/warp_parser/mod.rs", "ELSE_IF_WORDS"),
 		("src/warp_parser/mod.rs", "FALLBACK_WORDS"), ("src/warp_parser/mod.rs", "UNINDEXABLE_KEYWORDS"),
 		("src/warp_parser/mod.rs", "END_KEYWORD"), ("src/warp_parser/mod.rs", "AWAIT_KEYWORD"),
 		("src/analyzer/mod.rs", "RETURNING_KEYWORDS"), ("src/lowering/switch.rs", "SWITCH_WORDS"),
 		("src/lowering/switch.rs", "DEFAULT_KEYS"), ("src/lowering/declarations.rs", "TASK_WORDS"),
-		("src/pipeline.rs", "RAISE_WORDS"),
+		("src/pipeline.rs", "RAISE_WORDS"), ("src/warp_parser/mod.rs", "FINALLY_KEYWORD"),
 		("words", "for", "loop", "break", "continue", "try", "case", "once", "assert", "with"),
 	],
 	"keyword_function": [("src/operators.rs", "FUNCTION_KEYWORDS")],
@@ -93,7 +101,32 @@ SOURCES = {
 	],
 	"time_units": [("fn", "src/time/calendar.rs", "unit_named")],
 	"units": [("src/units.rs", "UNITS", "first"), ("src/units.rs", "LONG_NAMES", "first"), ("src/warp_parser/mod.rs", "UNIT_LOOP_WORDS")],
+	# soft keywords (P165) and the contextual words of events, tasks, reflection, list phrases, declarations and the
+	# server; last, so it keeps only the words no other scope has (`sort` and `first` stay built-ins)
+	"keyword_soft": [
+		("src/lowering/soft_keywords.rs", "SOFT_KEYWORDS"), ("src/lowering/soft_keywords.rs", "HIGHLIGHTED_WORDS"),
+		("src/lowering/event_signals.rs", "EMIT_ALIASES"), ("src/lowering/event_signals.rs", "ON_WORD"),
+		("src/lowering/variable_signals.rs", "BEFORE_WORD"), ("src/lowering/variable_signals.rs", "WHENEVER_WORD"),
+		("src/lowering/declarations.rs", "FINISH_EVENT"),
+		("src/lowering/declarations.rs", "WITHIN_WORD"), ("src/lowering/declarations.rs", "EXTENSION_WORD"),
+		("src/lowering/reflection.rs", "FIELDS_WORDS"), ("src/lowering/reflection.rs", "METHODS_WORD"),
+		("src/lowering/reflection.rs", "PARAMS_WORDS"), ("src/lowering/reflection.rs", "SIGNATURE_WORD"),
+		("src/lowering/reflection.rs", "EXPORTS_WORD"), ("src/lowering/list_phrases.rs", "WHERE_WORD"),
+		("src/lowering/list_phrases.rs", "KEEP"), ("src/warp_parser/mod.rs", "EACH_WORD"),
+		("src/warp_parser/mod.rs", "EXTENDS_KEYWORD"), ("src/warp_parser/mod.rs", "IMPLEMENTS_WORD"),
+		("src/warp_parser/mod.rs", "MIXIN_WORD"), ("src/warp_parser/mod.rs", "OPERATOR_KINDS", "first"),
+		("src/warp_parser/mod.rs", "PRECEDENCE_DIRECTIONS", "first"), ("src/law.rs", "LAW_KEYWORD"),
+		("src/lowering/references.rs", "REFERENCE_WORD"), ("src/lowering/serve.rs", "SERVE_WORD"),
+		("src/lowering/serve.rs", "SERVER_WORD"), ("src/lowering/routes.rs", "ROUTE_WORD"),
+		("src/lowering/serve.rs", "DATABASE_WORDS"),
+	],
 }
+# P165's two lists: each of their words must land in some scope
+P165_LISTS = [("src/lowering/soft_keywords.rs", "HARD_KEYWORDS"), ("src/lowering/soft_keywords.rs", "SOFT_KEYWORDS")]
+# the scopes of keywords proper, each word of which wiki/keyword.md documents (types, built-ins and units have pages of their own)
+DOCUMENTED_SCOPES = ["constant_language", "variable_language", "keyword_control", "keyword_function", "keyword_declaration",
+                     "keyword_import", "storage_modifier", "keyword_operator_word", "keyword_soft"]
+KEYWORD_PAGE = WARP / "wiki" / "keyword.md"
 # a word in several scopes keeps the first, in this order (`in` is control flow before it is an operator)
 SCOPE_ORDER = list(SOURCES)
 CALL_CHECKED = "runtime_tables"
@@ -258,8 +291,7 @@ def longest_first(found):
 	return sorted(found, key=lambda token: (-len(token), token))
 
 
-def collect_words():
-	rust = RustSources(WARP)
+def collect_words(rust):
 	corpus = usage_corpus()
 	taken, words = {}, {}  # word → the scope that has it
 	for scope in SCOPE_ORDER:
@@ -281,6 +313,17 @@ def collect_words():
 	return words
 
 
+def uncolored_keywords(rust, words):
+	colored = {word for found in words.values() for word in found}
+	return sorted({word for source in P165_LISTS for word in rust.constant_words(*source)} - colored)
+
+
+def undocumented_keywords(words):
+	page = KEYWORD_PAGE.read_text()
+	return sorted({word for scope in DOCUMENTED_SCOPES for word in words[scope]
+	               if not re.search(rf"(?<![\w]){re.escape(word)}(?![\w])", page)})
+
+
 def generated_variables(words, syntax):
 	"""A variable per word list the syntax names or that has words; an empty one never matches"""
 	lines = [BEGIN_MARK, "  # from warp's sources, see SOURCES in scripts/update_words.py; rerun instead of editing"]
@@ -298,16 +341,22 @@ def rewrite_syntax(words):
 def write_completions(words):
 	completions = [{"trigger": f"{word}\tbuilt-in", "contents": f"{word}($1)"} for word in sorted(words["support_function"])]
 	completions += [{"trigger": f"{word}\t{scope.replace('_', ' ')}", "contents": word}
-	                for scope in ["keyword_control", "keyword_function", "keyword_declaration", "keyword_import", "storage_modifier",
-	                              "keyword_operator_word", "storage_type", "constant_language"]
+	                for scope in DOCUMENTED_SCOPES + ["storage_type"]
 	                for word in sorted(words[scope])]
 	rows = ",\n".join("\t\t" + json.dumps(completion, ensure_ascii=False) for completion in completions)
 	COMPLETIONS.write_text(f'{{\n\t"scope": "source.warp",\n\t"completions": [\n{rows}\n\t]\n}}\n')
 
 
 if __name__ == "__main__":
-	found_words = collect_words()
+	rust_sources = RustSources(WARP)
+	found_words = collect_words(rust_sources)
 	rewrite_syntax(found_words)
 	write_completions(found_words)
 	for scope, found in found_words.items():
 		print(f"{scope} ({len(found)}): {' '.join(sorted(found))}")
+	problems = {"P165 keywords no scope colors": uncolored_keywords(rust_sources, found_words),
+	            f"keywords {KEYWORD_PAGE} does not document": undocumented_keywords(found_words)}
+	for problem, found in problems.items():
+		if found:
+			print(f"error: {problem}: {' '.join(found)}", file=sys.stderr)
+	sys.exit(1 if any(problems.values()) else 0)
